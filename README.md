@@ -1,6 +1,6 @@
-# ResumeCraft
+# AI Resume Builder
 
-**ResumeCraft** is an AI-powered resume builder designed to help users create professional, customized resumes with ease. By leveraging AI, ResumeCraft ensures that each resume is tailored to highlight the user’s skills, experience, and achievements effectively.
+**AI Resume Builder** is an AI-powered resume builder designed to help users create professional, customized resumes with ease. By leveraging AI, it ensures that each resume is tailored to highlight the user’s skills, experience, and achievements effectively.
 
 
 ## <a name="features">✨ Features </a>
@@ -19,7 +19,7 @@
 
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
-- **Frontend:** Next.js 14.2.5
+- **Frontend:** React.js
 
 - **Authentication:** Clerk
 
