@@ -20,7 +20,7 @@ const ProjectPreview = () => {
         }}
       />
 
-      {formData?.project?.map((project: any, index: number) => (
+      {formData?.projects?.map((project: any, index: number) => (
         <div key={index} className="my-5">
           <div className="flex justify-between items-center">
             <h2
@@ -33,7 +33,7 @@ const ProjectPreview = () => {
             </h2>
             <span className="text-xs">
               {project?.startDate}
-              {project?.startDate && (project?.endDate || project?.endDate === "") && " to "}
+              {project?.startDate && (project?.endDate || project?.endDate === "") && " - "}
               {project?.startDate && project?.endDate == "" ? "Present" : project.endDate}
             </span>
           </div>

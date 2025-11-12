@@ -17,8 +17,8 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [aiGeneratedSummaryList, setAiGeneratedSummaryList] = useState([] as any)
   const [projectList, setProjectList] = useState(
-    Array.isArray(formData?.project) && formData.project.length > 0
-      ? formData.project
+    Array.isArray(formData?.projects) && formData.projects.length > 0
+      ? formData.projects
       : [
           {
             title: "",
@@ -42,7 +42,7 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
 
     handleInputChange({
       target: {
-        name: "project",
+        name: "projects",
         value: newEntries,
       },
     })
@@ -64,7 +64,7 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
 
     handleInputChange({
       target: {
-        name: "project",
+        name: "projects",
         value: newEntries,
       },
     })
@@ -80,14 +80,14 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
 
     handleInputChange({
       target: {
-        name: "project",
+        name: "projects",
         value: newEntries,
       },
     })
   }
 
   const generateProjectDescriptionFromAI = async (index: number) => {
-    if (!formData?.project?.[index]?.title || formData?.project?.[index]?.title === "") {
+    if (!formData?.projects?.[index]?.title || formData?.projects?.[index]?.title === "") {
       toast({
         title: "Uh Oh! Something went wrong.",
         description: "Please enter the project title to generate summary.",
@@ -103,10 +103,10 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
     setIsAiLoading(true)
 
     const result = await generateProjectDescription(
-      `${formData?.project[index]?.title}`,
-      `${formData?.project[index]?.technologies || "various technologies"}`
+      `${formData?.projects?.[index]?.title}`,
+      `${formData?.projects?.[index]?.technologies || "various technologies"}`,
+      formData?.projects?.[index]?.projectSummary,
     )
-    
 
     setAiGeneratedSummaryList(result)
 
@@ -125,7 +125,7 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
 
     setIsLoading(true)
 
-    const result = await addProjectToResume(params.id, formData.project)
+    const result = await addProjectToResume(params.id, formData.projects)
 
     if (result.success) {
       toast({
@@ -239,10 +239,10 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
         </div>
         <div className="mt-3 flex gap-2 justify-between">
           <div className="flex gap-2">
-            <Button variant="outline" onClick={AddNewProject} className="text-primary">
+            <Button variant="outline" onClick={AddNewProject} className="text-primary bg-transparent">
               <Plus className="size-4 mr-2" /> Add More
             </Button>
-            <Button variant="outline" onClick={RemoveProject} className="text-primary">
+            <Button variant="outline" onClick={RemoveProject} className="text-primary bg-transparent">
               <Minus className="size-4 mr-2" /> Remove
             </Button>
           </div>
@@ -260,7 +260,9 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
 
       {aiGeneratedSummaryList.length > 0 && (
         <div className="my-5" ref={listRef}>
-          <h2 className="font-bold text-lg">Suggestions</h2>
+          <h2 className="font-bold text-lg">
+            {aiGeneratedSummaryList[0]?.isEnhanced ? "Enhanced Version:" : "Suggestions"}
+          </h2>
           {aiGeneratedSummaryList?.map((item: any, index: number) => (
             <div
               key={index}
@@ -274,7 +276,9 @@ const ProjectForm = ({ params }: { params: { id: string } }) => {
               }`}
               aria-disabled={isAiLoading}
             >
-              <h2 className="font-semibold my-1 text-primary text-gray-800">Level: {item?.activity_level}</h2>
+              {!item?.isEnhanced && (
+                <h2 className="font-semibold my-1 text-primary text-gray-800">Level: {item?.activity_level}</h2>
+              )}
               <p className="text-justify text-gray-600">{item?.description}</p>
             </div>
           ))}

@@ -36,7 +36,7 @@ const ExperiencePreview = () => {
               {experience?.startDate}
               {experience?.startDate &&
                 (experience?.endDate || experience?.endDate === "") &&
-                " to "}
+                " - "}
               {experience?.startDate && experience?.endDate == ""
                 ? "Present"
                 : experience.endDate}

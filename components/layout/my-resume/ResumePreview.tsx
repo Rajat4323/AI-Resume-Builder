@@ -22,7 +22,7 @@ const ResumePreview = () => {
   return (
     <div className="flex items-center justify-center">
       <div
-        className="shadow-lg p-14 border-t-[20px] bg-white w-[210mm] min-h-[297mm] print:shadow-none"
+        className="shadow-lg p-14 border-t-[20px] bg-white w-[210mm] min-h-[297mm] print:shadow-none print:border-t-0 print:pt-4 print:mt-0"
         style={{
           borderColor: formData?.themeColor || themeColors[0],
         }}
@@ -30,7 +30,7 @@ const ResumePreview = () => {
         <PersonalDetailsPreview />
         <SummaryPreview />
         {formData?.experience?.length > 0 && <ExperiencePreview />}
-        {formData?.project?.length > 0 && <ProjectPreview />}
+        {formData?.projects?.length > 0 && <ProjectPreview />}
         {formData?.education?.length > 0 && <EducationalPreview />}
         {formData?.skills?.length > 0 && <SkillsPreview />}
       </div>

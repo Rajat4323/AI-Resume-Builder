@@ -1,95 +1,89 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { generateSummary } from "@/lib/actions/gemini.actions";
-import { updateResume } from "@/lib/actions/resume.actions";
-import { useFormContext } from "@/lib/context/FormProvider";
-import { Brain, Loader2 } from "lucide-react";
-import React, { useRef, useState } from "react";
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
+import { generateSummary } from "@/lib/actions/gemini.actions"
+import { updateResume } from "@/lib/actions/resume.actions"
+import { useFormContext } from "@/lib/context/FormProvider"
+import { Brain, Loader2 } from "lucide-react"
+import { useRef, useState } from "react"
 
 const SummaryForm = ({ params }: { params: { id: string } }) => {
-  const listRef = useRef<HTMLDivElement>(null);
-  const { formData, handleInputChange } = useFormContext();
-  const [summary, setSummary] = useState(formData?.summary || "");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiGeneratedSummaryList, setAiGeneratedSummaryList] = useState(
-    [] as any
-  );
-  const { toast } = useToast();
+  const listRef = useRef<HTMLDivElement>(null)
+  const { formData, handleInputChange } = useFormContext()
+  const [summary, setSummary] = useState(formData?.summary || "")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [aiGeneratedSummaryList, setAiGeneratedSummaryList] = useState([] as any)
+  const { toast } = useToast()
 
   const handleSummaryChange = (e: any) => {
-    const newSummary = e.target.value;
-    setSummary(newSummary);
+    const newSummary = e.target.value
+    setSummary(newSummary)
 
     handleInputChange({
       target: {
         name: "summary",
         value: newSummary,
       },
-    });
-  };
+    })
+  }
 
   const generateSummaryFromAI = async () => {
-    setIsAiLoading(true);
+    setIsAiLoading(true)
 
-    const result = await generateSummary(formData?.jobTitle);
+    const result = await generateSummary(formData?.jobTitle, summary)
 
-    setAiGeneratedSummaryList(result);
+    setAiGeneratedSummaryList(result)
 
-    setIsAiLoading(false);
+    setIsAiLoading(false)
 
-    setTimeout(function () {
+    setTimeout(() => {
       listRef?.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
-      });
-    }, 100);
-  };
+      })
+    }, 100)
+  }
 
   const onSave = async (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     const updates = {
       summary: formData?.summary,
-    };
+    }
 
     const result = await updateResume({
       resumeId: params.id,
       updates: updates,
-    });
+    })
 
     if (result.success) {
       toast({
         title: "Information saved.",
         description: "Summary updated successfully.",
         className: "bg-white",
-      });
+      })
     } else {
       toast({
         title: "Uh Oh! Something went wrong.",
         description: result?.error,
         variant: "destructive",
         className: "bg-white",
-      });
+      })
     }
 
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   return (
     <div>
       <div className="p-5 shadow-lg rounded-lg border-t-primary-700 border-t-4 bg-white">
-        <h2 className="text-lg font-semibold leading-none tracking-tight">
-          Summary
-        </h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Add summary about your job
-        </p>
+        <h2 className="text-lg font-semibold leading-none tracking-tight">Summary</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Add summary about your job</p>
 
         <form className="mt-5 space-y-2" onSubmit={onSave}>
           <div className="flex justify-between items-end">
@@ -97,19 +91,15 @@ const SummaryForm = ({ params }: { params: { id: string } }) => {
             <Button
               variant="outline"
               onClick={() => {
-                generateSummaryFromAI();
+                generateSummaryFromAI()
               }}
               type="button"
               size="sm"
               className="bg-gradient-to-r from-indigo-500 to-cyan-400 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:from-indigo-600 hover:to-cyan-500 transition flex gap-2"
               disabled={isAiLoading}
             >
-              {isAiLoading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Brain className="h-4 w-4" />
-              )}{" "}
-              Generate from AI
+              {isAiLoading ? <Loader2 size={16} className="animate-spin" /> : <Brain className="h-4 w-4" />} Generate
+              from AI
             </Button>
           </div>
           <Textarea
@@ -120,11 +110,7 @@ const SummaryForm = ({ params }: { params: { id: string } }) => {
             defaultValue={formData?.summary || ""}
           />
           <div className="flex justify-end">
-            <Button
-              className="mt-3 bg-primary-700 hover:bg-primary-800 text-white"
-              type="submit"
-              disabled={isLoading}
-            >
+            <Button className="mt-3 bg-primary-700 hover:bg-primary-800 text-white" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 size={20} className="animate-spin" /> &nbsp; Saving
@@ -139,7 +125,9 @@ const SummaryForm = ({ params }: { params: { id: string } }) => {
 
       {aiGeneratedSummaryList.length > 0 && (
         <div className="my-5" ref={listRef}>
-          <h2 className="font-bold text-lg">Suggestions</h2>
+          <h2 className="font-bold text-lg">
+            {aiGeneratedSummaryList[0]?.isEnhanced ? "Enhanced Version:" : "Suggestions"}
+          </h2>
           {aiGeneratedSummaryList?.map((item: any, index: number) => (
             <div
               key={index}
@@ -153,16 +141,16 @@ const SummaryForm = ({ params }: { params: { id: string } }) => {
               }`}
               aria-disabled={isAiLoading}
             >
-              <h2 className="font-semibold my-1 text-primary text-gray-800">
-                Level: {item?.experience_level}
-              </h2>
+              {!item?.isEnhanced && (
+                <h2 className="font-semibold my-1 text-primary text-gray-800">Level: {item?.experience_level}</h2>
+              )}
               <p className="text-justify text-gray-600">{item?.summary}</p>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SummaryForm;
+export default SummaryForm

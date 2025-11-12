@@ -1,23 +1,21 @@
-"use client";
+"use client"
 
-import RichTextEditor from "@/components/common/RichTextEditor";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { generateExperienceDescription } from "@/lib/actions/gemini.actions";
-import { addExperienceToResume } from "@/lib/actions/resume.actions";
-import { useFormContext } from "@/lib/context/FormProvider";
-import { Brain, Loader2, Minus, Plus } from "lucide-react";
-import React, { useRef, useState } from "react";
+import RichTextEditor from "@/components/common/RichTextEditor"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
+import { generateExperienceDescription } from "@/lib/actions/gemini.actions"
+import { addExperienceToResume } from "@/lib/actions/resume.actions"
+import { useFormContext } from "@/lib/context/FormProvider"
+import { Brain, Loader2, Minus, Plus } from "lucide-react"
+import { useRef, useState } from "react"
 
 const ExperienceForm = ({ params }: { params: { id: string } }) => {
-  const listRef = useRef<HTMLDivElement>(null);
-  const { formData, handleInputChange } = useFormContext();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiGeneratedSummaryList, setAiGeneratedSummaryList] = useState(
-    [] as any
-  );
+  const listRef = useRef<HTMLDivElement>(null)
+  const { formData, handleInputChange } = useFormContext()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [aiGeneratedSummaryList, setAiGeneratedSummaryList] = useState([] as any)
   const [experienceList, setExperienceList] = useState(
     Array.isArray(formData?.experience) && formData.experience.length > 0
       ? formData.experience
@@ -31,27 +29,25 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
             endDate: "",
             workSummary: "",
           },
-        ]
-  );
-  
-  const [currentAiIndex, setCurrentAiIndex] = useState(
-    experienceList.length - 1
-  );
-  const { toast } = useToast();
+        ],
+  )
+
+  const [currentAiIndex, setCurrentAiIndex] = useState(experienceList.length - 1)
+  const { toast } = useToast()
 
   const handleChange = (index: number, event: any) => {
-    const newEntries = experienceList.slice();
-    const { name, value } = event.target;
-    newEntries[index][name] = value;
-    setExperienceList(newEntries);
+    const newEntries = experienceList.slice()
+    const { name, value } = event.target
+    newEntries[index][name] = value
+    setExperienceList(newEntries)
 
     handleInputChange({
       target: {
         name: "experience",
         value: newEntries,
       },
-    });
-  };
+    })
+  }
 
   const AddNewExperience = () => {
     const newEntries = [
@@ -65,23 +61,23 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
         endDate: "",
         workSummary: "",
       },
-    ];
-    setExperienceList(newEntries);
+    ]
+    setExperienceList(newEntries)
 
     handleInputChange({
       target: {
         name: "experience",
         value: newEntries,
       },
-    });
-  };
+    })
+  }
 
   const RemoveExperience = () => {
-    const newEntries = experienceList.slice(0, -1);
-    setExperienceList(newEntries);
+    const newEntries = experienceList.slice(0, -1)
+    setExperienceList(newEntries)
 
     if (currentAiIndex > newEntries.length - 1) {
-      setCurrentAiIndex(newEntries.length - 1);
+      setCurrentAiIndex(newEntries.length - 1)
     }
 
     handleInputChange({
@@ -89,8 +85,8 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
         name: "experience",
         value: newEntries,
       },
-    });
-  };
+    })
+  }
 
   const generateExperienceDescriptionFromAI = async (index: number) => {
     if (
@@ -101,78 +97,72 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
     ) {
       toast({
         title: "Uh Oh! Something went wrong.",
-        description:
-          "Please enter the position title and company name to generate summary.",
+        description: "Please enter the position title and company name to generate summary.",
         variant: "destructive",
         className: "bg-white border-2",
-      });
+      })
 
-      return;
+      return
     }
 
-    setCurrentAiIndex(index);
+    setCurrentAiIndex(index)
 
-    setIsAiLoading(true);
+    setIsAiLoading(true)
 
     const result = await generateExperienceDescription(
-      `${formData?.experience[index]?.title} at ${formData?.experience[index]?.companyName}`
-    );
+      `${formData?.experience[index]?.title} at ${formData?.experience[index]?.companyName}`,
+      formData?.experience[index]?.workSummary,
+    )
 
-    setAiGeneratedSummaryList(result);
+    setAiGeneratedSummaryList(result)
 
-    setIsAiLoading(false);
+    setIsAiLoading(false)
 
-    setTimeout(function () {
+    setTimeout(() => {
       listRef?.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
-      });
-    }, 100);
-  };
+      })
+    }, 100)
+  }
 
   const onSave = async (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    setIsLoading(true);
+    setIsLoading(true)
 
-    const result = await addExperienceToResume(params.id, formData.experience);
+    const result = await addExperienceToResume(params.id, formData.experience)
 
     if (result.success) {
       toast({
         title: "Information saved.",
         description: "Professional experience updated successfully.",
         className: "bg-white",
-      });
+      })
     } else {
       toast({
         title: "Uh Oh! Something went wrong.",
         description: result?.error,
         variant: "destructive",
         className: "bg-white",
-      });
+      })
     }
 
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   return (
     <div>
       <div className="p-5 shadow-lg rounded-lg border-t-primary-700 border-t-4 bg-white">
-        <h2 className="text-lg font-semibold leading-none tracking-tight">
-          Professional Experience
-        </h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Add your previous job experiences
-        </p>
+        <h2 className="text-lg font-semibold leading-none tracking-tight">Professional Experience</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Add your previous job experiences</p>
 
         <div className="mt-5">
           {experienceList.map((item: any, index: number) => (
             <div key={index}>
               <div className="grid grid-cols-2 gap-3 border p-3 my-5 rounded-lg">
                 <div className="space-y-2">
-                  <label className="text-slate-700 font-semibold">
-                    Position Title:
-                  </label>
+                  <label className="text-slate-700 font-semibold">Position Title:</label>
                   <Input
                     name="title"
                     onChange={(event) => handleChange(index, event)}
@@ -181,9 +171,7 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-slate-700 font-semibold">
-                    Company Name:
-                  </label>
+                  <label className="text-slate-700 font-semibold">Company Name:</label>
                   <Input
                     name="companyName"
                     onChange={(event) => handleChange(index, event)}
@@ -210,9 +198,7 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-slate-700 font-semibold">
-                    Start Date:
-                  </label>
+                  <label className="text-slate-700 font-semibold">Start Date:</label>
                   <Input
                     type="date"
                     name="startDate"
@@ -222,9 +208,7 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-slate-700 font-semibold">
-                    End Date:
-                  </label>
+                  <label className="text-slate-700 font-semibold">End Date:</label>
                   <Input
                     type="date"
                     name="endDate"
@@ -235,13 +219,11 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
                 </div>
                 <div className="col-span-2 space-y-2">
                   <div className="flex justify-between items-end">
-                    <label className=" text-slate-700 font-semibold">
-                      Summary:
-                    </label>
+                    <label className=" text-slate-700 font-semibold">Summary:</label>
                     <Button
                       variant="outline"
                       onClick={() => {
-                        generateExperienceDescriptionFromAI(index);
+                        generateExperienceDescriptionFromAI(index)
                       }}
                       type="button"
                       size="sm"
@@ -258,8 +240,10 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
                   </div>
                   <RichTextEditor
                     defaultValue={item?.workSummary || ""}
-                    onRichTextEditorChange={(value: string) =>
-                      handleChange(index, value)
+                    onRichTextEditorChange={(value: any) =>
+                      handleChange(index, {
+                        target: { name: "workSummary", value: value.target.value },
+                      })
                     }
                   />
                 </div>
@@ -269,26 +253,14 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
         </div>
         <div className="mt-3 flex gap-2 justify-between">
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={AddNewExperience}
-              className="text-primary"
-            >
+            <Button variant="outline" onClick={AddNewExperience} className="text-primary bg-transparent">
               <Plus className="size-4 mr-2" /> Add More
             </Button>
-            <Button
-              variant="outline"
-              onClick={RemoveExperience}
-              className="text-primary"
-            >
+            <Button variant="outline" onClick={RemoveExperience} className="text-primary bg-transparent">
               <Minus className="size-4 mr-2" /> Remove
             </Button>
           </div>
-          <Button
-            disabled={isLoading}
-            onClick={onSave}
-            className="bg-primary-700 hover:bg-primary-800 text-white"
-          >
+          <Button disabled={isLoading} onClick={onSave} className="bg-primary-700 hover:bg-primary-800 text-white">
             {isLoading ? (
               <>
                 <Loader2 size={20} className="animate-spin" /> &nbsp; Saving
@@ -302,7 +274,9 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
 
       {aiGeneratedSummaryList.length > 0 && (
         <div className="my-5" ref={listRef}>
-          <h2 className="font-bold text-lg">Suggestions</h2>
+          <h2 className="font-bold text-lg">
+            {aiGeneratedSummaryList[0]?.isEnhanced ? "Enhanced Version" : "Suggestions"}
+          </h2>
           {aiGeneratedSummaryList?.map((item: any, index: number) => (
             <div
               key={index}
@@ -316,16 +290,16 @@ const ExperienceForm = ({ params }: { params: { id: string } }) => {
               }`}
               aria-disabled={isAiLoading}
             >
-              <h2 className="font-semibold my-1 text-primary text-gray-800">
-                Level: {item?.activity_level}
-              </h2>
+              {!item?.isEnhanced && (
+                <h2 className="font-semibold my-1 text-primary text-gray-800">Level: {item?.activity_level}</h2>
+              )}
               <p className="text-justify text-gray-600">{item?.description}</p>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ExperienceForm;
+export default ExperienceForm

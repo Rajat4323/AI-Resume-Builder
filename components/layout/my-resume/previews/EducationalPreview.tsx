@@ -36,7 +36,7 @@ const EducationalPreview = () => {
               {education?.startDate}
               {education?.startDate &&
                 (education?.endDate || education?.endDate === "") &&
-                " to "}
+                " - "}
               {education?.startDate && education?.endDate == ""
                 ? "Present"
                 : education.endDate}
